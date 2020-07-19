@@ -1,6 +1,11 @@
 import React from "react";
-
 import Background from "../components/Background";
+
+const style: React.CSSProperties = {
+  backgroundColor: "yellow",
+  width: "200px",
+  height: "200px",
+};
 
 export default function a() {
   return (
@@ -13,7 +18,7 @@ export default function a() {
         width: "40%",
       }}
     >
-      <Background />
+      <Background styles={style} />
     </div>
   );
 }

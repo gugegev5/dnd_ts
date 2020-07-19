@@ -5,6 +5,7 @@ import { CameraTwoTone } from "@ant-design/icons";
 
 import LeftAttr from "../layout/LeftAttr";
 import RightDisplay from "../layout/RightDisplay";
+import { ItemTypes } from "../components/ItemTypes";
 
 const { Content, Sider } = Layout;
 
@@ -31,7 +32,7 @@ export default function PageLayout() {
           style={{ padding: "24px 16px", height: "100vh", display: "flex" }}
         >
           <LeftAttr />
-          <RightDisplay />
+          <RightDisplay accept={[ItemTypes.Background]} onDrop={() => {}} />
         </Content>
       </Layout>
     </Layout>

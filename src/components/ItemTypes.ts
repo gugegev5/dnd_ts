@@ -1,3 +1,3 @@
-export const ItemTypes = {
-	Background: 'Background',
+export enum ItemTypes {
+  Background = "Background",
 }
