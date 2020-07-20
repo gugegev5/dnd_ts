@@ -18,7 +18,7 @@ export default function a() {
         width: "40%",
       }}
     >
-      <Background styles={style} />
+      <Background itemKey={'1'} />
     </div>
   );
 }

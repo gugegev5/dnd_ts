@@ -1,27 +1,37 @@
-import { createStore, combineReducers } from "redux";
-import { Reducer } from "react";
+import { createStore, combineReducers, CombinedState } from "redux";
+import { devToolsEnhancer } from "redux-devtools-extension";
+import ItemsReducers, {
+  ItemStatesI,
+  initialState as ItemsInitial,
+} from "./Items";
+import CompositionsReducers, {
+  CompositionItemI,
+  initialState as CompositionsInitial,
+} from "./Compositions";
+import { List } from "immutable";
 
-enum CompositionsAction {
-  INSERT = "INSERT",
-  UPDATE = "UPDATE",
+export interface RootStatesI {
+  Items: ItemStatesI;
+  Compositions: List<CompositionItemI>;
 }
 
-const compositions: Reducer<any, CompositionsAction> = () => {};
+const rootReducer = combineReducers<{ Items: any; Compositions: any }>({
+  Items: ItemsReducers,
+  Compositions: CompositionsReducers,
+});
 
-const reducers = {
-  compositions,
-};
-
-interface IExtractState<T extends typeof reducers> {
-  get<K extends keyof T>(
-    k: K
-  ): T[K] extends (...args: any[]) => any ? ReturnType<T[K]> : any;
-}
-
-export type IRootState = IExtractState<typeof reducers>;
-
-const rootReducer = combineReducers({ potato: () => {} });
-
-const store = createStore(rootReducer, {});
+const store = createStore<
+  CombinedState<{ Items: any; Compositions: any }>,
+  any,
+  any,
+  any
+>(
+  rootReducer,
+  {
+    Items: ItemsInitial,
+    Compositions: CompositionsInitial,
+  },
+  /* preloadedState, */ devToolsEnhancer({})
+);
 
 export default store;

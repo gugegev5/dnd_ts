@@ -2,6 +2,10 @@ import React from "react";
 import { useDrop } from "react-dnd";
 import { ItemTypes } from "../components/ItemTypes";
 import { Background } from "../components/Background";
+import { CompositionItemI } from "../store/Compositions";
+import { useSelector } from "react-redux";
+import { RootStatesI } from "../store";
+import { List } from "immutable";
 
 const style: React.CSSProperties = {
   padding: 24,
@@ -15,12 +19,6 @@ export interface BgProps {
   onDrop: (item: any) => void;
 }
 
-type CompositionItem = {
-  type: ItemTypes;
-  styles: React.CSSProperties;
-  childrens: Array<CompositionItem>;
-};
-
 function getComponent(type: ItemTypes): React.FC<any> {
   if (type === ItemTypes.Background) {
     return Background;
@@ -29,13 +27,14 @@ function getComponent(type: ItemTypes): React.FC<any> {
   }
 }
 
-function renderRecursion(compositions: Array<CompositionItem>): any {
+function renderRecursion(compositions: List<CompositionItemI>): any {
   return compositions.map((composition) => {
+    const a = composition.get("itemType");
     return /*#__PURE__*/ React.createElement(
-      getComponent(composition.type),
-      { styles: composition.styles },
-      ...(composition.childrens.length
-        ? renderRecursion(composition.childrens)
+      getComponent(composition.get("itemType")),
+      { itemKey: composition.get("itemKey") },
+      ...(composition.get("childrens").size
+        ? renderRecursion(composition.get("childrens"))
         : [])
     );
   });
@@ -44,7 +43,7 @@ function renderRecursion(compositions: Array<CompositionItem>): any {
 function RenderCompositions({
   compositions,
 }: {
-  compositions: Array<CompositionItem>;
+  compositions: List<CompositionItemI>;
 }): any {
   return /*#__PURE__*/ React.createElement(
     React.Fragment,
@@ -54,48 +53,27 @@ function RenderCompositions({
 }
 
 const RightDisplay: React.FC<BgProps> = ({ accept, onDrop }) => {
-  const compositions: Array<CompositionItem> = [
-    {
-      type: ItemTypes.Background,
-      styles: { backgroundColor: "yellow", width: "200px", height: "200px" },
-      childrens: [
-        {
-          type: ItemTypes.Background,
-          styles: { backgroundColor: "red", width: "100px", height: "100px" },
-          childrens: [],
-        },
-      ],
-    },
-    {
-      type: ItemTypes.Background,
-      styles: { backgroundColor: "blue", width: "200px", height: "200px" },
-      childrens: [
-        {
-          type: ItemTypes.Background,
-          styles: { backgroundColor: "white", width: "100px", height: "100px" },
-          childrens: [],
-        },
-      ],
-    },
-  ];
-
-  const [{ isOver, canDrop }, drop] = useDrop({
+  const [{ backgroundColor = "#222" }, drop] = useDrop({
     accept,
     drop: onDrop,
-    collect: (monitor) => ({
-      isOver: monitor.isOver(),
-      canDrop: monitor.canDrop(),
-    }),
+    collect: (monitor) => {
+      const isOver = monitor.isOver(),
+        canDrop = monitor.canDrop();
+      const isActive = isOver && canDrop;
+      let bgColor;
+      if (isActive) {
+        bgColor = "darkgreen";
+      } else if (canDrop) {
+        bgColor = "darkkhaki";
+      }
+      return { backgroundColor: bgColor };
+    },
   });
 
-  const isActive = isOver && canDrop;
-  let backgroundColor = "#222";
-  if (isActive) {
-    backgroundColor = "darkgreen";
-  } else if (canDrop) {
-    backgroundColor = "darkkhaki";
-  }
-
+  const compositions = useSelector((state: RootStatesI) => {
+    return state.Compositions;
+  });
+  console.log(compositions);
   return (
     <div ref={drop} style={{ ...style, backgroundColor }}>
       <RenderCompositions compositions={compositions} />
