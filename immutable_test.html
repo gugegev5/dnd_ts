@@ -1,0 +1,22 @@
+<html>
+
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/immutable/4.0.0-rc.12/immutable.js"></script>
+    <script>
+        var map = Immutable.fromJS({
+            name: 'a',
+            childrens: [{
+                name: 'b',
+                childrens: [
+                    { name: 'd', childrens: [] }
+                ]
+            }, {
+                name: 'c'
+            }]
+        });
+        var map1 = map.updateIn(['childrens'], list => list.push({ name: 'e' }))
+
+    </script>
+</head>
+
+</html>

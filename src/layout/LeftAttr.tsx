@@ -14,7 +14,6 @@ export default function a() {
       style={{
         padding: 24,
         textAlign: "center",
-        borderRight: "black solid 1px",
         width: "40%",
       }}
     >

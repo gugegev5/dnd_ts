@@ -34,12 +34,23 @@ export const initialState: ItemStatesI = {
     itemKey: "2",
     styles: { backgroundColor: "red", width: "100px", height: "100px" },
   },
-  "3": {
+  
+  "1000": {
+    itemType: ItemTypes.Background,
+    itemKey: "1000",
+    styles: { backgroundColor: "white", width: "100px", height: "100px" },
+  },
+  "1001": {
+    itemType: ItemTypes.Background,
+    itemKey: "1000",
+    styles: { backgroundColor: "white", width: "90px", height: "90px" },
+  },
+  "1002": {
     itemType: ItemTypes.Background,
     itemKey: "3",
     styles: { backgroundColor: "blue", width: "200px", height: "200px" },
   },
-  "4": {
+  "1003": {
     itemType: ItemTypes.Background,
     itemKey: "4",
     styles: { backgroundColor: "white", width: "100px", height: "100px" },

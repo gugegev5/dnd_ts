@@ -1,9 +1,9 @@
 import { ItemTypes } from "../components/ItemTypes";
 import { Action } from "redux";
 import { List, fromJS, Map } from "immutable";
-// import { defaultItemKeys } from "../components/ItemTypes";
+import { defaultItemKeys } from "../components/ItemTypes";
 
-enum CompositionsActionNames {
+export enum CompositionsActionNames {
   INSERT = "INSERT",
   UPDATE = "UPDATE",
   DELETE = "DELETE",
@@ -13,19 +13,24 @@ export type CompositionItemObj = {
   itemType: ItemTypes;
   itemKey: string;
   // styles: React.CSSProperties;
-  childrens: List<CompositionMap<any, any>>;
+  childrens: List<CompositionItemI>;
 };
 
-interface CompositionMap<K, V> extends Map<K, V> {
+export interface CompositionItemI extends Map<keyof CompositionItemObj, any> {
   get: <K extends keyof CompositionItemObj>(key: K) => CompositionItemObj[K];
+  updateIn(
+    keyPath: Iterable<string>,
+    updater: (value: List<CompositionItemI>) => any
+  ): this;
 }
 
-export type CompositionItemI = CompositionMap<keyof CompositionItemObj, any>;
+// export type CompositionItemI = CompositionMap;
 
 export interface CompositionsActionTypesI
   extends Action<CompositionsActionNames> {
-  itemKey: string;
-  itemType: ItemTypes;
+  sourceItemKey?: string;
+  targetItemKey: string;
+  sourceItemType: ItemTypes;
 }
 
 export interface CompositionStateI {
@@ -38,70 +43,88 @@ export interface CompositionStatesI {
   [index: string]: CompositionStateI;
 }
 
-export const initialState: List<CompositionItemI> = fromJS([
-  {
-    itemType: ItemTypes.Background,
-    itemKey: "1",
-    childrens: [
-      {
-        itemType: ItemTypes.Background,
-        itemKey: "2",
-        childrens: [],
-      },
-    ],
-  },
-  {
-    itemType: ItemTypes.Background,
-    itemKey: "3",
-    childrens: [
-      {
-        itemType: ItemTypes.Background,
-        itemKey: "4",
-        childrens: [],
-      },
-    ],
-  },
-]);
+export const initialState: CompositionItemI = fromJS({
+  itemType: ItemTypes.Default,
+  itemKey: defaultItemKeys.Default,
+  childrens: [
+    {
+      itemType: ItemTypes.Background,
+      itemKey: "1",
+      childrens: [
+        {
+          itemType: ItemTypes.Background,
+          itemKey: "2",
+          childrens: [],
+        },
+      ],
+    },
+    {
+      itemType: ItemTypes.Background,
+      itemKey: "3",
+      childrens: [],
+    },
+  ],
+});
 
-// function searchByItemKey(
-//   state: List<CompositionItem>|undefined,
-//   itemKey: string
-// ): CompositionItem {
-//     if(state){
-//   for (let i = 0; i < state.size; i++) {
-//     if (state.get(i)?.itemKey === itemKey) {
-//       return state.get(i);
-//     } else {
-//       const result = searchByItemKey(state.get(i)?.childrens, itemKey);
-//       if (result.itemType !== ItemTypes.Default) {
-//         return result;
-//       }
-//     }
-//   }
+function searchByItemKey(
+  state: CompositionItemI,
+  itemKey: string
+): [string[], CompositionItemI] {
+  const keyPath = ["childrens"];
+  if (state.get("itemKey") !== itemKey) {
+    const res = searchRecursByItemKey(state.get("childrens"), itemKey, keyPath);
+    if (res) {
+      return res;
+    }
+  }
+  return [keyPath, state];
+}
 
-//   return {
-//     itemType: ItemTypes.Default,
-//     itemKey: defaultItemKeys.Default,
-//     childrens: [],
-//   };
-// }
+function searchRecursByItemKey(
+  childrens: List<CompositionItemI>,
+  itemKey: string,
+  keyPath: string[]
+): [string[], CompositionItemI] | undefined {
+  for (let i = 0; i < childrens.size; i++) {
+    const item = childrens.get(i);
+    if (item!.get("itemKey") === itemKey) {
+      keyPath.push(`${i}`);
+      return [keyPath, item!];
+    } else {
+      keyPath.push("childrens");
+      const res = searchRecursByItemKey(
+        item!.get("childrens"),
+        itemKey,
+        keyPath
+      );
+      if (res) {
+        return res;
+      }
+    }
+  }
+
+  return undefined;
+}
 
 const CompositionsReducers = function (
-  state: List<CompositionItemI> = initialState,
+  state: CompositionItemI = initialState,
   action: CompositionsActionTypesI
-) {
-  //   if (action.type === CompositionsActionNames.INSERT) {
-  // const item = searchByItemKey(state, action.itemKey);
-  // if (item.itemType === ItemTypes.Default) {
-  //   const itemTodo: CompositionItem = {
-  //     itemType: action.itemType,
-  //     itemKey: action.itemKey,
-  //     childrens: [],
-  //   };
-  //   return state.concat(itemTodo);
-  // } else {
-  //   return { ...state };
-  // }
+): CompositionItemI {
+  if (action.type === CompositionsActionNames.INSERT) {
+    const [keyPath] = searchByItemKey(state, action.targetItemKey);
+
+    const itemTodo = Map({
+      itemType: action.sourceItemType,
+      itemKey: action.sourceItemKey,
+      childrens: [],
+    });
+    return state.updateIn(keyPath, (childrens) =>
+      childrens.push(itemTodo as CompositionItemI)
+    );
+  }
+  // else {
+  // return { ...state };
+  //   }
   //   } else if (action.type === CompositionsActionNames.UPDATE) {
   //   } else if (action.type === CompositionsActionNames.DELETE) {
   //   } else {
@@ -109,5 +132,4 @@ const CompositionsReducers = function (
   //   }
   return state;
 };
-
 export default CompositionsReducers;

@@ -12,7 +12,7 @@ import { List } from "immutable";
 
 export interface RootStatesI {
   Items: ItemStatesI;
-  Compositions: List<CompositionItemI>;
+  Compositions: CompositionItemI;
 }
 
 const rootReducer = combineReducers<{ Items: any; Compositions: any }>({

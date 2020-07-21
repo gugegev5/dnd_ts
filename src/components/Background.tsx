@@ -7,6 +7,11 @@ import { RootStatesI } from "../store";
 export interface BoxProps {
   itemKey: string;
 }
+const defaultStyles = {
+  backgroundColor: "white",
+  width: "100px",
+  height: "100px",
+};
 const dragType = ItemTypes.Background;
 
 export const Background: React.FC<BoxProps> = ({ itemKey, children }) => {
@@ -19,7 +24,7 @@ export const Background: React.FC<BoxProps> = ({ itemKey, children }) => {
 
   const styles = useSelector((state: RootStatesI) => {
     const itemProps = state.Items[itemKey];
-    return itemProps.styles;
+    return itemProps?.styles || defaultStyles;
   });
 
   return (
