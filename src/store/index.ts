@@ -1,35 +1,36 @@
 import { createStore, combineReducers, CombinedState } from "redux";
 import { devToolsEnhancer } from "redux-devtools-extension";
 import ItemsReducers, {
-  ItemStatesI,
+  ItemsStateI,
   initialState as ItemsInitial,
 } from "./Items";
 import CompositionsReducers, {
-  CompositionItemI,
+  CompositionItemStateI,
   initialState as CompositionsInitial,
 } from "./Compositions";
-import { List } from "immutable";
+import ItemKeyReducers, {
+  ItemKeyStateI,
+  initialState as ItemKeyInitial,
+} from "./ItemKey";
 
-export interface RootStatesI {
-  Items: ItemStatesI;
-  Compositions: CompositionItemI;
+export interface RootStateI {
+  Items: ItemsStateI;
+  Compositions: CompositionItemStateI;
+  ItemKey: ItemKeyStateI;
 }
 
-const rootReducer = combineReducers<{ Items: any; Compositions: any }>({
+const rootReducer = combineReducers<RootStateI>({
   Items: ItemsReducers,
   Compositions: CompositionsReducers,
+  ItemKey: ItemKeyReducers,
 });
 
-const store = createStore<
-  CombinedState<{ Items: any; Compositions: any }>,
-  any,
-  any,
-  any
->(
+const store = createStore<CombinedState<RootStateI>, any, any, any>(
   rootReducer,
   {
     Items: ItemsInitial,
     Compositions: CompositionsInitial,
+    ItemKey: ItemKeyInitial,
   },
   /* preloadedState, */ devToolsEnhancer({})
 );

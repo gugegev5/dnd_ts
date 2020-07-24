@@ -1,5 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import Background from "../components/Background";
+import { RootStateI } from "../store";
+import { useSelector } from "react-redux";
 
 const style: React.CSSProperties = {
   backgroundColor: "yellow",
@@ -7,7 +9,10 @@ const style: React.CSSProperties = {
   height: "200px",
 };
 
-export default function a() {
+export default function () {
+  const newItemKey = useSelector((state: RootStateI) => {
+    return state.ItemKey.newItemKey;
+  });
   return (
     <div
       className="left"
@@ -17,7 +22,7 @@ export default function a() {
         width: "40%",
       }}
     >
-      <Background itemKey={'1'} />
+      <Background itemKey={newItemKey} />
     </div>
   );
 }

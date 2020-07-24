@@ -1,7 +1,7 @@
 import { ItemTypes } from "../components/ItemTypes";
 import { Action } from "redux";
 
-enum ItemsActionNames {
+export enum ItemsActionNames {
   INSERT = "INSERT",
   UPDATE = "UPDATE",
   DELETE = "DELETE",
@@ -9,56 +9,50 @@ enum ItemsActionNames {
 
 export interface ItemsActionTypesI extends Action<ItemsActionNames> {}
 
-export interface ItemStateI {
+export interface SingleItemStateI {
   itemType: ItemTypes;
   itemKey: string;
   styles: { [index: string]: string };
 }
 
-export interface ItemStatesI {
-  [index: string]: ItemStateI;
+export interface ItemsStateI {
+  [index: string]: SingleItemStateI;
 }
 
-export const initialState: ItemStatesI = {
-  "1": {
-    itemType: ItemTypes.Background,
-    itemKey: "1",
-    styles: {
-      backgroundColor: "yellow",
-      width: "200px",
-      height: "200px",
-    },
-  },
-  "2": {
-    itemType: ItemTypes.Background,
-    itemKey: "2",
-    styles: { backgroundColor: "red", width: "100px", height: "100px" },
-  },
-  
-  "1000": {
-    itemType: ItemTypes.Background,
-    itemKey: "1000",
-    styles: { backgroundColor: "white", width: "100px", height: "100px" },
-  },
-  "1001": {
-    itemType: ItemTypes.Background,
-    itemKey: "1000",
-    styles: { backgroundColor: "white", width: "90px", height: "90px" },
-  },
-  "1002": {
-    itemType: ItemTypes.Background,
-    itemKey: "3",
-    styles: { backgroundColor: "blue", width: "200px", height: "200px" },
-  },
-  "1003": {
-    itemType: ItemTypes.Background,
-    itemKey: "4",
-    styles: { backgroundColor: "white", width: "100px", height: "100px" },
-  },
+export const initialState: ItemsStateI = {
+  // "1": {
+  //   itemType: ItemTypes.Background,
+  //   itemKey: "1",
+  //   styles: {
+  //     backgroundColor: "#ffff00",
+  //     width: "200px",
+  //     height: "200px",
+  //   },
+  // },
+  // "2": {
+  //   itemType: ItemTypes.Background,
+  //   itemKey: "2",
+  //   styles: { backgroundColor: "#ff0000", width: "100px", height: "100px" },
+  // },
 };
 
+(() => {
+  for (let i = 1000; i < 1255; i++) {
+    const colors = ["#ff0000", "#0f0", "#0000ff", "#ffff00", "#ff00ff", "#00ffff"];
+    initialState[i] = {
+      itemType: ItemTypes.Background,
+      itemKey: "4",
+      styles: {
+        backgroundColor: colors[i % 6],
+        width: "100px",
+        height: "100px",
+      },
+    };
+  }
+})();
+
 const ItemsReducers = (
-  state: ItemStatesI = initialState,
+  state: ItemsStateI = initialState,
   action: ItemsActionTypesI
 ) => {
   switch (action.type) {

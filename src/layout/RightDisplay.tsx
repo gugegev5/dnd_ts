@@ -1,16 +1,20 @@
 import React, { Dispatch } from "react";
 import { useDrop } from "react-dnd";
-import { ItemTypes, defaultItemKeys } from "../components/ItemTypes";
+import {
+  ItemTypes,
+  defaultItemKeys,
+  CommonDragItemI,
+} from "../components/ItemTypes";
 import { Background } from "../components/Background";
 import {
-  CompositionItemI,
+  CompositionItemStateI,
   CompositionsActionTypesI,
   CompositionsActionNames,
 } from "../store/Compositions";
 import { useSelector, useDispatch } from "react-redux";
-import { RootStatesI } from "../store";
-import { List } from "immutable";
-import ItemKeyGen from "../utils/ItemKeyGen";
+import { RootStateI } from "../store";
+import { List, is } from "immutable";
+import { dropColorHandler } from "../utils/Interact";
 
 const style: React.CSSProperties = {
   textAlign: "center",
@@ -18,10 +22,7 @@ const style: React.CSSProperties = {
   border: "red solid",
 };
 
-export interface BgProps {
-  // accept: string[];
-  // onDrop: (item: any) => void;
-}
+export interface BgProps {}
 
 function getComponent(type: ItemTypes): React.FC<any> {
   if (type === ItemTypes.Background) {
@@ -31,7 +32,7 @@ function getComponent(type: ItemTypes): React.FC<any> {
   }
 }
 
-function renderRecursion(compositions: List<CompositionItemI>): any {
+function renderRecursion(compositions: List<CompositionItemStateI>): any {
   return compositions.map((composition) => {
     return /*#__PURE__*/ React.createElement(
       getComponent(composition.get("itemType")),
@@ -46,7 +47,7 @@ function renderRecursion(compositions: List<CompositionItemI>): any {
 function RenderCompositions({
   compositions,
 }: {
-  compositions: List<CompositionItemI>;
+  compositions: List<CompositionItemStateI>;
 }): any {
   return /*#__PURE__*/ React.createElement(
     React.Fragment,
@@ -57,37 +58,40 @@ function RenderCompositions({
 
 const accept = [ItemTypes.Background];
 const RightDisplay: React.FC<BgProps> = () => {
+  const itemKey = defaultItemKeys.Default;
   const dispatch = useDispatch<Dispatch<CompositionsActionTypesI>>();
-  const [{ backgroundColor = "#222" }, drop] = useDrop({
+
+  const [{ backgroundColor, border }, drop] = useDrop<
+    CommonDragItemI,
+    any,
+    any
+  >({
     accept,
-    drop: () => {
-      dispatch({
-        type: CompositionsActionNames.INSERT,
-        targetItemKey: defaultItemKeys.Default,
-        sourceItemType: ItemTypes.Background,
-        sourceItemKey: ItemKeyGen(),
-      });
+    drop: (item, monitor) => {
+      if (!monitor.didDrop()) {
+        //drop when not nested
+        dispatch({
+          type: CompositionsActionNames.INSERT,
+          targetItemKey: itemKey,
+          sourceItemType: item.type,
+          sourceItemKey: item.itemKey,
+        });
+      }
     },
     collect: (monitor) => {
-      const isOver = monitor.isOver(),
-        canDrop = monitor.canDrop();
-      const isActive = isOver && canDrop;
-      let bgColor;
-      if (isActive) {
-        bgColor = "darkgreen";
-      } else if (canDrop) {
-        bgColor = "darkkhaki";
-      }
-      return { backgroundColor: bgColor };
+      return { ...dropColorHandler(monitor, style) };
     },
   });
 
-  const compositions = useSelector((state: RootStatesI) => {
-    return state.Compositions.get("childrens");
-  });
-  console.log(compositions.toJS());
+  const compositions = useSelector(
+    (state: RootStateI) => {
+      return state.Compositions.get("childrens");
+    },
+    (a, b) => is(a, b)
+  );
+  // console.log(compositions.toJS());
   return (
-    <div ref={drop} style={{ ...style, backgroundColor }}>
+    <div ref={drop} style={{ ...style, backgroundColor, border }}>
       <RenderCompositions compositions={compositions} />
     </div>
   );
