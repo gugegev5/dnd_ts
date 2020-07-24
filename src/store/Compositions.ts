@@ -126,20 +126,16 @@ const CompositionsReducers = function (
         childrens: [],
       });
       return state.updateIn(keyPath.concat("childrens"), (childrens) => {
-        const pushres = childrens.size
+        return childrens.size
           ? childrens.push(itemTodo as CompositionItemStateI)
           : List([itemTodo]);
-
-        return pushres;
       });
     }
   } else if (action.type === CompositionsActionNames.DELETE) {
     const [keyPath] = searchByItemKey(state, action.targetItemKey);
 
-    const res = keyPath && keyPath.length ? state.removeIn(keyPath) : state;
-    return res;
+    return keyPath && keyPath.length ? state.removeIn(keyPath) : state;
   }
-  //   } else if (action.type === CompositionsActionNames.UPDATE) {
   return state;
 };
 export default CompositionsReducers;

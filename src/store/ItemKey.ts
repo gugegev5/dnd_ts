@@ -1,7 +1,7 @@
 import { Action } from "redux";
-import { ItemsActionNames } from "./Items";
+import { CompositionsActionNames } from "./Compositions";
 
-export interface ItemKeyActionTypesI extends Action<ItemsActionNames> {}
+export interface ItemKeyActionTypesI extends Action<CompositionsActionNames> {}
 
 export interface ItemKeyStateI {
   newItemKey: string;
@@ -15,7 +15,7 @@ const ItemKeyReducers = (
   state: ItemKeyStateI = initialState,
   action: ItemKeyActionTypesI
 ): ItemKeyStateI => {
-  if (action.type === ItemsActionNames.INSERT) {
+  if (action.type === CompositionsActionNames.INSERT) {
     return { newItemKey: `${parseInt(state.newItemKey, 10) + 1}` };
   }
   return state;

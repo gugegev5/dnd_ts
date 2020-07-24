@@ -18,7 +18,7 @@ import { dropColorHandler } from "../utils/Interact";
 
 const style: React.CSSProperties = {
   textAlign: "center",
-  width: "60%",
+  width: "50%",
   border: "red solid",
 };
 
@@ -61,11 +61,7 @@ const RightDisplay: React.FC<BgProps> = () => {
   const itemKey = defaultItemKeys.Default;
   const dispatch = useDispatch<Dispatch<CompositionsActionTypesI>>();
 
-  const [{ backgroundColor, border }, drop] = useDrop<
-    CommonDragItemI,
-    any,
-    any
-  >({
+  const [{ dropStyles }, drop] = useDrop<CommonDragItemI, any, any>({
     accept,
     drop: (item, monitor) => {
       if (!monitor.didDrop()) {
@@ -79,7 +75,7 @@ const RightDisplay: React.FC<BgProps> = () => {
       }
     },
     collect: (monitor) => {
-      return { ...dropColorHandler(monitor, style) };
+      return { dropStyles: { ...dropColorHandler(monitor, style) } };
     },
   });
 
@@ -91,7 +87,7 @@ const RightDisplay: React.FC<BgProps> = () => {
   );
   // console.log(compositions.toJS());
   return (
-    <div ref={drop} style={{ ...style, backgroundColor, border }}>
+    <div ref={drop} style={{ ...style, ...dropStyles }}>
       <RenderCompositions compositions={compositions} />
     </div>
   );

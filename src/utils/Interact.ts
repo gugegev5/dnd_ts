@@ -7,13 +7,14 @@ export function dropColorHandler(monitor: DropTargetMonitor, initial?: any) {
   const isOver = monitor.isOver({ shallow: true }),
     canDrop = monitor.canDrop();
   const isActive = isOver && canDrop;
-  let bgColor = initial?.backgroundColor,
-    border = initial?.border;
+  let bgColor = initial?.backgroundColor;
   if (isActive) {
     bgColor = dropColor;
-    border = "red 2px dotted";
+    const border = "red 2px dotted";
+    return { backgroundColor: bgColor, border };
   } else if (canDrop) {
-    bgColor = bgColor?`${bgColor}88`:canDropColor;
+    bgColor = bgColor ? `${bgColor}88` : canDropColor;
+    return { backgroundColor: bgColor };
   }
-  return { backgroundColor: bgColor, border };
+  return {};
 }

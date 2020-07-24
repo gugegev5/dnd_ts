@@ -11,7 +11,7 @@ const { Content, Sider } = Layout;
 export default function PageLayout() {
   return (
     <Layout>
-      <Sider
+      {/* <Sider
         style={{
           overflow: "auto",
           height: "100vh",
@@ -25,8 +25,8 @@ export default function PageLayout() {
             Background
           </Menu.Item>
         </Menu>
-      </Sider>
-      <Layout className="site-layout" style={{ marginLeft: 200 }}>
+      </Sider> */}
+      <Layout className="site-layout">
         <Content
           style={{ padding: "24px 16px", height: "100vh", display: "flex" }}
         >

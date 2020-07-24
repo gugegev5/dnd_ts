@@ -1,4 +1,5 @@
 import React, { Dispatch } from "react";
+import { Input } from "antd";
 import { useDrag, useDrop } from "react-dnd";
 import {
   ItemTypes,
@@ -12,6 +13,7 @@ import {
   CompositionsActionNames,
 } from "../store/Compositions";
 import { dropColorHandler } from "../utils/Interact";
+import { ItemsActionTypesI, ItemsActionNames } from "../store/Items";
 
 type BoxProps = Pick<CommonDragItemI, "itemKey"> &
   Partial<Pick<CommonDragItemI, "compositionActionName">>;
@@ -30,10 +32,15 @@ export const Background: React.FC<BoxProps> = ({
 }) => {
   const dispatch = useDispatch<Dispatch<CompositionsActionTypesI>>();
 
-  const styles = useSelector((state: RootStateI) => {
-    const itemProps = state.Items[itemKey];
-    return itemProps?.styles || defaultStyles;
-  });
+  const styles = useSelector(
+    (state: RootStateI) => {
+      const itemProps = state.Items[itemKey];
+      return itemProps?.styles || defaultStyles;
+    },
+    (left, right) => {
+      return false;
+    }
+  );
 
   const [{ opacity }, drag] = useDrag<
     CommonDragItemI,
@@ -42,6 +49,7 @@ export const Background: React.FC<BoxProps> = ({
   >({
     item: { type: dragType, itemKey, compositionActionName },
     end: (item, monitor) => {
+      //delete
       if (!monitor.didDrop()) {
         dispatch({
           type: CompositionsActionNames.DELETE,
@@ -84,4 +92,86 @@ export const Background: React.FC<BoxProps> = ({
   );
 };
 
-export default Background;
+const UpdateBoard: React.FC<{ itemKey: string }> = ({ itemKey }) => {
+  const dispatch = useDispatch<Dispatch<ItemsActionTypesI>>();
+  const styles = useSelector((state: RootStateI) => {
+    const itemProps = state.Items[itemKey];
+    return itemProps?.styles || defaultStyles;
+  });
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "flex-start",
+      }}
+    >
+      <div>宽：</div>
+      <div>
+        <Input
+          value={styles.width || "100px"}
+          onChange={(e) => {
+            dispatch({
+              type: ItemsActionNames.UPDATE,
+              sourceItemKey: itemKey,
+              sourceItemType: ItemTypes.Background,
+              styles: { width: e.target.value },
+            });
+          }}
+        />
+      </div>
+      <div>高：</div>
+      <div>
+        <Input
+          value={styles.height || "200px"}
+          onChange={(e) => {
+            dispatch({
+              type: ItemsActionNames.UPDATE,
+              sourceItemKey: itemKey,
+              sourceItemType: ItemTypes.Background,
+              styles: { height: e.target.value },
+            });
+          }}
+        />
+      </div>
+      <div>背景颜色：</div>
+      <div>
+        <Input
+          value={styles.backgroundColor || "#FFFFFF"}
+          onChange={(e) => {
+            dispatch({
+              type: ItemsActionNames.UPDATE,
+              sourceItemKey: itemKey,
+              sourceItemType: ItemTypes.Background,
+              styles: { backgroundColor: e.target.value },
+            });
+          }}
+        />
+      </div>
+      <div>背景图：</div>
+      <div>
+        <Input
+          value={styles.backgroundImage}
+          onChange={(e) => {
+            dispatch({
+              type: ItemsActionNames.UPDATE,
+              sourceItemKey: itemKey,
+              sourceItemType: ItemTypes.Background,
+              styles: { backgroundImage: e.target.value },
+            });
+          }}
+        />
+      </div>
+    </div>
+  );
+};
+
+const LeftAttr: React.FC<BoxProps> = ({ itemKey }) => {
+  return (
+    <>
+      <Background itemKey={itemKey} />
+      <UpdateBoard itemKey={itemKey} />
+    </>
+  );
+};
+export default LeftAttr;

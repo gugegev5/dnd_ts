@@ -1,13 +1,7 @@
-import React, { useState } from "react";
+import React from "react";
 import Background from "../components/Background";
 import { RootStateI } from "../store";
 import { useSelector } from "react-redux";
-
-const style: React.CSSProperties = {
-  backgroundColor: "yellow",
-  width: "200px",
-  height: "200px",
-};
 
 export default function () {
   const newItemKey = useSelector((state: RootStateI) => {
@@ -19,7 +13,7 @@ export default function () {
       style={{
         padding: 24,
         textAlign: "center",
-        width: "40%",
+        width: "50%",
       }}
     >
       <Background itemKey={newItemKey} />
