@@ -18,6 +18,7 @@ import { dropColorHandler } from "../utils/Interact";
 
 const style: React.CSSProperties = {
   textAlign: "center",
+  margin: "0 10px",
   width: "50%",
   border: "red solid",
 };

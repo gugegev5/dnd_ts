@@ -1,5 +1,6 @@
 import { ItemTypes } from "../components/ItemTypes";
 import { Action } from "redux";
+
 export enum ItemsActionNames {
   INSERT = "INSERT",
   UPDATE = "UPDATE",
@@ -31,11 +32,13 @@ const colors = [
   "#00ffff",
 ];
 
+const position: "static" = "static";
 export const initialState: ItemsStateI = {
   "1000": {
     itemType: ItemTypes.Background,
     itemKey: "1",
     styles: {
+      position,
       backgroundColor: "#ffffff",
       width: "100%",
       height: "200px",
@@ -52,6 +55,7 @@ function generateItem(itemType: ItemTypes, itemKey: string) {
     itemType,
     itemKey,
     styles: {
+      position,
       backgroundColor: colors[parseInt(itemKey, 10) % 6],
       width: "100%",
       height: "200px",
@@ -62,7 +66,7 @@ function generateItem(itemType: ItemTypes, itemKey: string) {
     },
   };
 }
-
+let storeNewKey = 1001;
 const ItemsReducers = (
   state: ItemsStateI = initialState,
   action: ItemsActionTypesI
@@ -70,7 +74,7 @@ const ItemsReducers = (
   switch (action.type) {
     case ItemsActionNames.INSERT:
       return (function () {
-        const newKey = `${parseInt(action.sourceItemKey, 10) + 1}`;
+        const newKey = `${storeNewKey++}`;
         const itemStyle = generateItem(action.sourceItemType, newKey);
         console.log("item style insert", itemStyle);
         return { ...state, [newKey]: itemStyle };

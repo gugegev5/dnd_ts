@@ -1,5 +1,5 @@
 import React, { Dispatch } from "react";
-import { Input } from "antd";
+import { Input, Select } from "antd";
 import { useDrag, useDrop } from "react-dnd";
 import {
   ItemTypes,
@@ -30,7 +30,9 @@ export const Background: React.FC<BoxProps> = ({
   compositionActionName = CompositionsActionNames.UPDATE,
   children,
 }) => {
-  const dispatch = useDispatch<Dispatch<CompositionsActionTypesI>>();
+  const dispatch = useDispatch<
+    Dispatch<CompositionsActionTypesI | ItemsActionTypesI>
+  >();
 
   const styles = useSelector(
     (state: RootStateI) => {
@@ -49,6 +51,7 @@ export const Background: React.FC<BoxProps> = ({
   >({
     item: { type: dragType, itemKey, compositionActionName },
     end: (item, monitor) => {
+      console.log("drag ", compositionActionName);
       //delete
       if (!monitor.didDrop()) {
         dispatch({
@@ -67,14 +70,35 @@ export const Background: React.FC<BoxProps> = ({
   const [{ dropStyles }, drop] = useDrop<CommonDragItemI, any, any>({
     accept,
     drop: (item, monitor) => {
+      //drop when not nested
       if (!monitor.didDrop()) {
-        //drop when not nested
-        dispatch({
-          type: CompositionsActionNames.INSERT,
-          targetItemKey: itemKey,
-          sourceItemType: item.type,
-          sourceItemKey: item.itemKey,
-        });
+        if (item.compositionActionName === CompositionsActionNames.INSERT) {
+          dispatch({
+            type: CompositionsActionNames.INSERT,
+            targetItemKey: itemKey,
+            sourceItemType: item.type,
+            sourceItemKey: item.itemKey,
+          });
+        } else {
+          //update
+          const delta = monitor.getDifferenceFromInitialOffset() as {
+            x: number;
+            y: number;
+          };
+          let left = Math.round(
+            parseInt((styles.left as string) || "0", 10) + delta.x
+          );
+          let top = Math.round(
+            parseInt((styles.top as string) || "0", 10) + delta.y
+          );
+          dispatch({
+            type: ItemsActionNames.UPDATE,
+            sourceItemKey: item.itemKey,
+            sourceItemType: item.type,
+            styles: { top, left },
+          });
+          console.log("relative", delta);
+        }
       }
     },
     collect: (monitor) => {
@@ -86,6 +110,7 @@ export const Background: React.FC<BoxProps> = ({
     <div
       ref={(node) => drag(drop(node))}
       style={{ ...styles, opacity, ...dropStyles }}
+      data-itemKey={itemKey}
     >
       {children}
     </div>
@@ -103,11 +128,22 @@ const UpdateBoard: React.FC<{ itemKey: string }> = ({ itemKey }) => {
       style={{
         display: "flex",
         flexDirection: "column",
-        alignItems: "flex-start",
       }}
     >
-      <div>宽：</div>
-      <div>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+        }}
+      >
+        <span
+          style={{
+            flex: "1 0 70px",
+            textAlignLast: "right",
+          }}
+        >
+          宽：
+        </span>
         <Input
           value={styles.width || "100px"}
           onChange={(e) => {
@@ -120,8 +156,20 @@ const UpdateBoard: React.FC<{ itemKey: string }> = ({ itemKey }) => {
           }}
         />
       </div>
-      <div>高：</div>
-      <div>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+        }}
+      >
+        <span
+          style={{
+            flex: "1 0 70px",
+            textAlignLast: "right",
+          }}
+        >
+          高：
+        </span>
         <Input
           value={styles.height || "200px"}
           onChange={(e) => {
@@ -134,8 +182,20 @@ const UpdateBoard: React.FC<{ itemKey: string }> = ({ itemKey }) => {
           }}
         />
       </div>
-      <div>背景颜色：</div>
-      <div>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+        }}
+      >
+        <span
+          style={{
+            flex: "1 0 70px",
+            textAlignLast: "right",
+          }}
+        >
+          背景颜色：
+        </span>
         <Input
           value={styles.backgroundColor || "#FFFFFF"}
           onChange={(e) => {
@@ -148,8 +208,20 @@ const UpdateBoard: React.FC<{ itemKey: string }> = ({ itemKey }) => {
           }}
         />
       </div>
-      <div>背景图：</div>
-      <div>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+        }}
+      >
+        <span
+          style={{
+            flex: "1 0 70px",
+            textAlignLast: "right",
+          }}
+        >
+          背景图：
+        </span>
         <Input
           value={styles.backgroundImage}
           onChange={(e) => {
@@ -162,14 +234,48 @@ const UpdateBoard: React.FC<{ itemKey: string }> = ({ itemKey }) => {
           }}
         />
       </div>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+        }}
+      >
+        <span
+          style={{
+            flex: "1 0 70px",
+            textAlignLast: "right",
+          }}
+        >
+          position：
+        </span>
+        {/* todotodo */}
+        <Select
+          style={{ width: "100%" }}
+          defaultValue="static"
+          onChange={(value) => {
+            dispatch({
+              type: ItemsActionNames.UPDATE,
+              sourceItemKey: itemKey,
+              sourceItemType: ItemTypes.Background,
+              styles: { position: value as "relative" },
+            });
+          }}
+        >
+          <Select.Option value="static">static</Select.Option>
+          <Select.Option value="relative">relative</Select.Option>
+        </Select>
+      </div>
     </div>
   );
 };
 
-const LeftAttr: React.FC<BoxProps> = ({ itemKey }) => {
+const LeftAttr: React.FC<BoxProps> = ({ itemKey, compositionActionName }) => {
   return (
     <>
-      <Background itemKey={itemKey} />
+      <Background
+        itemKey={itemKey}
+        compositionActionName={compositionActionName}
+      />
       <UpdateBoard itemKey={itemKey} />
     </>
   );

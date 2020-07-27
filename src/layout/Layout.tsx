@@ -1,12 +1,12 @@
 import React from "react";
 
-import { Layout, Menu } from "antd";
-import { CameraTwoTone } from "@ant-design/icons";
+import { Layout } from "antd";
+// import { CameraTwoTone } from "@ant-design/icons";
 
 import LeftAttr from "../layout/LeftAttr";
 import RightDisplay from "../layout/RightDisplay";
 
-const { Content, Sider } = Layout;
+const { Content } = Layout;
 
 export default function PageLayout() {
   return (
@@ -28,7 +28,7 @@ export default function PageLayout() {
       </Sider> */}
       <Layout className="site-layout">
         <Content
-          style={{ padding: "24px 16px", height: "100vh", display: "flex" }}
+          style={{ padding: "24px 0", height: "100vh", display: "flex" }}
         >
           <LeftAttr />
           <RightDisplay />
